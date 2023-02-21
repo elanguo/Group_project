@@ -1,0 +1,19 @@
+---
+title: "Group Project Data"
+output: html_document
+date: "2023-02-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+getwd()
+```
+```{r}
+diabetes_1 <- read_csv("Group Project Data/diabetes_dataset__2019.csv")
+diabetes_2 <- read_csv("Group Project Data/diabetes.csv")
+heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv")
+```
+
