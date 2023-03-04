@@ -20,9 +20,36 @@ getwd()
 ```
 
 ```{r}
-diabetes_1 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
-diabetes_2 <- read_csv("Group Project Data/diabetes.csv") %>% clean_names()
+diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
+diabetes <- read_csv("Group Project Data/diabetes.csv") %>% clean_names()
 heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv") %>% clean_names()
 ```
+## Alter diabetes dataset:
+Make Diabetes status as numeric values instead of categorical. 
+```{r}
+diabetes <- diabetes %>% 
+  mutate(diabetes_status = ifelse(diabetes == "Diabetes", 1, 0))
+```
+Do the same thing to diabetes_2019
+```{r}
+diabetes_2019 <- diabetes_2019 %>% 
+  mutate(diabetes_status = ifelse(diabetic == "yes", 1, 0))
+```
+
+## Make plots that shows distribution of diabetes by age. 
+```{r}
+diabetes %>% 
+  mutate(age_catagory = case_when(age <= 19 ~ "teenager",
+                                  age >= 20 & age <= 39 ~ "young adult",
+                                  age >= 40 & age <= 59 ~ "middle age",
+                                  age >= 60 & age <= 79 ~ "senior",
+                                  age >= 80 & age <= 100 ~ "super senior"),
+         ) %>% 
+  group_by(age_catagory) %>% 
+  summarise(diabetic = sum(diabetes_status)) %>% 
+  ggplot(aes(x=reorder(age_catagory, diabetic), y=diabetic, fill = age_catagory))+
+  geom_col()
+```
+
 
 
