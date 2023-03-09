@@ -10,9 +10,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ```{r, message = FALSE}
 library(tidyverse)
-library(here)
+library(RColorBrewer)
+library(paletteer)
 library(janitor)
-library(lubridate)
+library(here)
+library(naniar)
+library(shiny)
+library(shinydashboard)
 ```
 
 ```{r}
@@ -24,32 +28,56 @@ diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% c
 diabetes <- read_csv("Group Project Data/diabetes.csv") %>% clean_names()
 heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv") %>% clean_names()
 ```
-## Alter diabetes dataset:
-Make Diabetes status as numeric values instead of categorical. 
+## Check for NA
 ```{r}
-diabetes <- diabetes %>% 
-  mutate(diabetes_status = ifelse(diabetes == "Diabetes", 1, 0))
+any_na(diabetes_2019)
 ```
-Do the same thing to diabetes_2019
+## NA overveiw
 ```{r}
-diabetes_2019 <- diabetes_2019 %>% 
-  mutate(diabetes_status = ifelse(diabetic == "yes", 1, 0))
+naniar::miss_var_summary(diabetes_2019)
 ```
 
-## Make plots that shows distribution of diabetes by age. 
+
+
+## Clean the data, make binary variables into numeric, countable variables. (Diabetes_2019)
 ```{r}
-diabetes %>% 
-  mutate(age_catagory = case_when(age <= 19 ~ "teenager",
-                                  age >= 20 & age <= 39 ~ "young adult",
-                                  age >= 40 & age <= 59 ~ "middle age",
-                                  age >= 60 & age <= 79 ~ "senior",
-                                  age >= 80 & age <= 100 ~ "super senior"),
-         ) %>% 
-  group_by(age_catagory) %>% 
-  summarise(diabetic = sum(diabetes_status)) %>% 
-  ggplot(aes(x=reorder(age_catagory, diabetic), y=diabetic, fill = age_catagory))+
+diabetes_2019_tidy <- diabetes_2019 %>% 
+  mutate(high_bp_status = ifelse(high_bp == "yes", 1, 0)) %>% 
+  mutate(family_heredity = ifelse(family_diabetes == "yes", 1, 0)) %>% 
+  mutate(diabetic_status = ifelse(diabetic == "yes", 1, 0))
+```
+
+## Plots for high blood pressure: whether high blood pressure has relationship with diabetic. 
+```{r}
+diabetes_2019_tidy %>% 
+  filter(diabetic_status != "NA") %>% 
+  count(high_bp, diabetic_status) %>% 
+  ggplot(aes(x=high_bp, y=n))+
   geom_col()
 ```
 
+## Relationship between physically active and diabetes: (Questions here, reorder, place them in order)
+```{r}
+diabetes_2019_tidy %>% 
+  filter(physically_active != "NA") %>% 
+  count(physically_active, diabetic_status) %>% 
+  ggplot(aes(x=reorder(physically_active, n), y=n))+
+  geom_col()
+```
 
+## Relationship between bmi and diabetes:
+
+# Distribution of bmi of the recorded people:
+```{r}
+diabetes_2019_tidy %>% 
+  ggplot(aes(x=bmi))+
+  geom_density()
+```
+
+# How bmi is connected to diabetes:
+```{r}
+diabetes_2019_tidy %>% 
+  ggplot(aes(x=diabetic, y=bmi))+
+  geom_boxplot()
+```
 
