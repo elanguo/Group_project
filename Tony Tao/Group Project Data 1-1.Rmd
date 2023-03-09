@@ -37,8 +37,6 @@ any_na(diabetes_2019)
 naniar::miss_var_summary(diabetes_2019)
 ```
 
-
-
 ## Clean the data, make binary variables into numeric, countable variables. (Diabetes_2019)
 ```{r}
 diabetes_2019_tidy <- diabetes_2019 %>% 
@@ -51,18 +49,34 @@ diabetes_2019_tidy <- diabetes_2019 %>%
 ```{r}
 diabetes_2019_tidy %>% 
   filter(diabetic_status != "NA") %>% 
-  count(high_bp, diabetic_status) %>% 
-  ggplot(aes(x=high_bp, y=n))+
-  geom_col()
+  group_by(high_bp) %>%
+  summarize(diabetic = sum(diabetic_status)) %>% 
+  ggplot(aes(x=high_bp, y=diabetic, fill = high_bp))+
+  geom_col(alpha = 0.6)+
+  geom_text(aes(label=diabetic, vjust = -0.3), color = "deepskyblue4")+
+  theme_linedraw()+
+  labs(title = "High Blood Pressure vs. Diabetic", 
+       x = "High Blood Pressure",
+       y = "Diabetic")+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ## Relationship between physically active and diabetes: (Questions here, reorder, place them in order)
 ```{r}
 diabetes_2019_tidy %>% 
   filter(physically_active != "NA") %>% 
-  count(physically_active, diabetic_status) %>% 
-  ggplot(aes(x=reorder(physically_active, n), y=n))+
-  geom_col()
+  filter(diabetic_status != "NA") %>% 
+  group_by(physically_active) %>% 
+  summarize(diabetic = sum(diabetic_status)) %>% 
+  ggplot(aes(x=physically_active, y=diabetic, fill = physically_active))+
+  geom_col(alpha = 0.6)+
+  scale_x_discrete(limits = c("none", "less than half an hr", "more than half an hr", "one hr or more"))+
+  geom_text(aes(label=diabetic, vjust = -0.2), color = "deepskyblue4")+
+  theme_linedraw()+
+  labs(title = "Physically Active vs. Diabetic", 
+       x = "Physically Active",
+       y = "Diabetic")+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ## Relationship between bmi and diabetes:
@@ -70,13 +84,25 @@ diabetes_2019_tidy %>%
 # Distribution of bmi of the recorded people:
 ```{r}
 diabetes_2019_tidy %>% 
+  filter(diabetic_status!="NA") %>% 
+  mutate(diabetic_status=as_factor(diabetic_status)) %>% 
   ggplot(aes(x=bmi))+
-  geom_density()
+  geom_density()+
+  facet_wrap(~diabetic_status)
+```
+
+```{r}
+diabetes_2019_tidy %>% 
+  filter(diabetic_status!="NA") %>% 
+  mutate(diabetic_status=as_factor(diabetic_status)) %>% 
+  ggplot(aes(x=bmi, fill=diabetic_status))+
+  geom_density(alpha=0.6)
 ```
 
 # How bmi is connected to diabetes:
 ```{r}
 diabetes_2019_tidy %>% 
+  filter(diabetic != "NA") %>% 
   ggplot(aes(x=diabetic, y=bmi))+
   geom_boxplot()
 ```
