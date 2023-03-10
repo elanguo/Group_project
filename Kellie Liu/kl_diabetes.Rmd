@@ -87,11 +87,12 @@ plot_data%>%
   labs(title="Diabetes Age Range",
        x="Age Group",
        y="Count")+
-  scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))
+  scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ```{r}
-diabetes%>% 
+plot_data%>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   mutate(age_category=case_when(age<=19~"teenager",
          age>=20 & age<40~"adult",
@@ -99,6 +100,8 @@ diabetes%>%
          age>=60 & age<80~"senior",
          age>=80~"super senior")) %>%  
   filter(age_category!="NA") %>% 
+  group_by()
+  summarize(diabetic_status = sum(diabetic)) %>% 
   ggplot(aes(x=diabetic))+
   geom_density()+
   facet_wrap(~age_category)
@@ -127,7 +130,8 @@ age_diabetes %>%
   geom_col(alpha=0.6, position="dodge")+
   labs(title="Glucose Level",
        x="Diabetes",
-       y="Glucose Level")
+       y="Glucose Level")+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 ```{r}
 diabetes %>% 
@@ -135,14 +139,16 @@ diabetes %>%
   mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
          chol_ratio>=3.5 & chol_ratio<5~"Borderline High",
          age>=5~"High")) %>%
-  select(chol_category, diabetic, gender) %>% 
-  group_by(chol_category, gender) %>% 
+  select(chol_category, diabetic) %>% 
+  group_by(chol_category) %>% 
   summarize(diabetic_status = sum(diabetic)) %>% 
-  ggplot(aes(x=chol_category, y=diabetic_status, fill=gender))+
+  ggplot(aes(x=chol_category, y=diabetic_status))+
   geom_col(alpha=0.6, position="dodge")+
+  geom_text(aes(label=diabetic_status, vjust = -0.5), color = "deepskyblue4")+
   labs(title="Cholesterol Ratio",
        x="Cholestrol Level",
        y="Diabetic")+
-  scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))
+  scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
