@@ -62,7 +62,12 @@ diabetes_2019_tidy %>%
 ```
 ```{r}
 diabetes_2019_tidy %>% 
-  count(diabetic_status, smoking)
+  filter(diabetic_status != "NA") %>% 
+  count(diabetic_status, smoking) %>% 
+  pivot_wider(names_from = diabetic_status,
+              names_prefix = "diabetic_",
+              values_from = n) %>% 
+  mutate(diabetic_per = diabetic_1/(diabetic_1+diabetic_2))
 ```
 
 ```{r}
