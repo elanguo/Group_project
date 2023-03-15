@@ -90,6 +90,9 @@ plot_data%>%
   scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+```{r}
+diabetes
+```
 
 ```{r}
 plot_data%>% 
@@ -133,6 +136,7 @@ age_diabetes %>%
        y="Glucose Level")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
