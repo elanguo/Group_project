@@ -32,6 +32,7 @@ heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_da
 ```{r}
 any_na(diabetes_2019)
 ```
+
 ## NA overveiw
 ```{r}
 naniar::miss_var_summary(diabetes_2019)
@@ -45,7 +46,7 @@ diabetes_2019_tidy <- diabetes_2019 %>%
   mutate(diabetic_status = ifelse(diabetic == "yes", 1, 0))
 ```
 
-## Plots for high blood pressure: whether high blood pressure has relationship with diabetic. 
+## Plots for high blood pressure: whether high blood pressure has relationship with diabetic. (Need more work)
 ```{r}
 diabetes_2019_tidy %>% 
   filter(diabetic_status != "NA") %>% 
@@ -67,43 +68,14 @@ diabetes_2019_tidy %>%
   pivot_wider(names_from = diabetic_status,
               names_prefix = "diabetic_",
               values_from = n) %>% 
-  mutate(diabetic_per = diabetic_1/(diabetic_1+diabetic_0))
-```
-## **Need more work!!!!!**
-
-```{r}
-diabetes_2019_tidy %>% 
-  select(bmi, gender, family_diabetes, high_bp, smoking, alcohol) %>% 
-  pivot_longer(-bmi,
-               names_to="risk_factor",
-               values_to="obs") %>% 
-  ggplot(aes(x=bmi))+
-  geom_density()+
-  facet_wrap(~risk_factor)
-```
-
-```{r}
-diabetes_2019_tidy %>% 
-  mutate(bmi_status = case_when(bmi <= 18.5 ~ "underweight",
-                                bmi > 18.5 & bmi <= 24.9 ~ "normal weight",
-                                bmi > 25 & bmi <= 29.9 ~ "overweight",
-                                bmi > 30 & bmi <= 34.9 ~ "class 1 obesity",
-                                bmi > 35 & bmi <= 39.9 ~ "class 2 obesity"))
-```
-
-
-```{r}
-diabetes_2019_tidy %>% 
-  filter(diabetic_status != "NA") %>% 
-  group_by(smoking) %>%
-  summarize(diabetic = sum(diabetic_status)) %>% 
-  ggplot(aes(x=smoking, y=diabetic, fill = smoking))+
+  mutate(diabetic_per = diabetic_1/(diabetic_1+diabetic_0)) %>% 
+  ggplot(aes(x=smoking, y=diabetic_per, fill = smoking, label=sprintf("%0.2f", round(diabetic_per, digits = 2))))+
   geom_col(alpha = 0.6)+
-  geom_text(aes(label=diabetic, vjust = -0.3), color = "deepskyblue4")+
+  geom_text( vjust = -0.3, color = "deepskyblue4")+
   theme_linedraw()+
   labs(title = "Smoking vs. Diabetic", 
        x = "Smoking",
-       y = "Diabetic")+
+       y = "Diabetic Perentage")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
@@ -124,32 +96,148 @@ diabetes_2019_tidy %>%
        y = "Diabetic")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
-## Relationship between bmi and diabetes:
-
-# Distribution of bmi of the recorded people:
-```{r}
-diabetes_2019_tidy %>% 
-  filter(diabetic_status!="NA") %>% 
-  mutate(diabetic_status=as_factor(diabetic_status)) %>% 
-  ggplot(aes(x=bmi))+
-  geom_density()+
-  facet_wrap(~diabetic_status)
-```
-
+## Bmi and Diabetes
 ```{r}
 diabetes_2019_tidy %>% 
   filter(diabetic_status!="NA") %>% 
   mutate(diabetic_status=as_factor(diabetic_status)) %>% 
   ggplot(aes(x=bmi, fill=diabetic_status))+
-  geom_density(alpha=0.6)
+  geom_density(alpha=0.6)+
+  theme_linedraw()+
+  labs(title = "Bmi vs. Diabetic", 
+       x = "Bmi",
+       y = NULL)+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 # How bmi is connected to diabetes:
 ```{r}
 diabetes_2019_tidy %>% 
   filter(diabetic != "NA") %>% 
-  ggplot(aes(x=diabetic, y=bmi))+
-  geom_boxplot()
+  ggplot(aes(x=diabetic, y=bmi, fill = diabetic))+
+  geom_boxplot()+
+  theme_linedraw()+
+  scale_fill_discrete(labels=c("No", "Yes"))+
+  labs(title = "Bmi vs. Diabetic", 
+       x = NULL,
+       y = NULL)+
+  guides(fill = guide_legend(title = "Diabetes"))+
+  theme(plot.title = element_text(hjust = 0.5))
 ```
 
+## Mapping of diabetes percentage by counties
+```{r}
+library(usmap)
+```
+
+```{r}
+here()
+map_data_2004 <- read_csv(here("Tony Tao", "Group Project Data", "DiabetesAtlas_CountyData2004.csv"), skip = 2, na = "No Data")
+map_data_2008 <- read_csv(here("Tony Tao", "Group Project Data", "DiabetesAtlas_CountyData2008.csv"), skip = 2, na = "No Data")
+map_data_2012 <- read_csv(here("Tony Tao", "Group Project Data", "DiabetesAtlas_CountyData2012.csv"), skip = 2, na = "No Data")
+map_data_2016 <- read_csv(here("Tony Tao", "Group Project Data", "DiabetesAtlas_CountyData2016.csv"), skip = 2, na = "No Data")
+map_data_2020 <- read_csv(here("Tony Tao", "Group Project Data", "DiabetesAtlas_CountyData2020.csv"), skip = 2, na = "No Data")
+```
+## For 2004:
+```{r}
+glimpse(map_data_2004)
+```
+
+```{r}
+map_data_2004$CountyFIPS <- as.numeric(map_data_2004$CountyFIPS)
+```
+
+```{r}
+map_data_focused_2004 <- map_data_2004 %>% 
+  select(CountyFIPS, Percentage) %>% 
+  rename(fips = CountyFIPS, values = Percentage)
+```
+
+```{r}
+summary(map_data_focused_2004$values)
+```
+
+```{r}
+plot_usmap(data = map_data_focused_2004)+
+  scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
+```
+
+## For 2008:
+```{r}
+map_data_2008$CountyFIPS <- as.numeric(map_data_2008$CountyFIPS)
+```
+
+```{r}
+map_data_focused_2008 <- map_data_2008 %>% 
+  select(CountyFIPS, Percentage) %>% 
+  rename(fips = CountyFIPS, values = Percentage)
+```
+
+```{r}
+summary(map_data_focused_2008$values)
+```
+
+```{r}
+plot_usmap(data = map_data_focused_2004)+
+  scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
+```
+
+## For 2012:
+```{r}
+map_data_2012$CountyFIPS <- as.numeric(map_data_2012$CountyFIPS)
+```
+
+```{r}
+map_data_focused_2012 <- map_data_2012 %>% 
+  select(CountyFIPS, Percentage) %>% 
+  rename(fips = CountyFIPS, values = Percentage)
+```
+
+```{r}
+summary(map_data_focused_2012$values)
+```
+
+```{r}
+plot_usmap(data = map_data_focused_2012)+
+  scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
+```
+
+## For 2016:
+```{r}
+map_data_2016$CountyFIPS <- as.numeric(map_data_2016$CountyFIPS)
+```
+
+```{r}
+map_data_focused_2016 <- map_data_2016 %>% 
+  select(CountyFIPS, Percentage) %>% 
+  rename(fips = CountyFIPS, values = Percentage)
+```
+
+```{r}
+summary(map_data_focused_2016$values)
+```
+
+```{r}
+plot_usmap(data = map_data_focused_2016)+
+  scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
+```
+
+## For 2020:
+```{r}
+map_data_2020$CountyFIPS <- as.numeric(map_data_2020$CountyFIPS)
+```
+
+```{r}
+map_data_focused_2020 <- map_data_2020 %>% 
+  select(CountyFIPS, Percentage) %>% 
+  rename(fips = CountyFIPS, values = Percentage)
+```
+
+```{r}
+summary(map_data_focused_2020$values)
+```
+
+```{r}
+plot_usmap(data = map_data_focused_2020)+
+  scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
+```
