@@ -326,6 +326,22 @@ diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
+
+```r
+age_diabetes %>%
+  select(diabetes, glucose, age_category) %>% 
+  group_by(diabetes, age_category) %>% 
+  ggplot(aes(x=diabetes, y=glucose, fill = diabetes))+
+  geom_boxplot(alpha=0.6)+
+  theme_linedraw()+
+  labs(title="Glucose Level",
+       x="Diabetes",
+       y="Glucose Level")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+![](diabetes_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+
 ## Cholesterol Ratio vs. Diabetes with Gender
 
 ```r
@@ -351,7 +367,7 @@ diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](diabetes_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](diabetes_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 ## Cholesterol Ratio vs. Gender
 
@@ -382,7 +398,7 @@ diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](diabetes_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](diabetes_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 ## Gender vs. Diabetes
 
@@ -403,5 +419,5 @@ diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](diabetes_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
+![](diabetes_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
