@@ -156,7 +156,7 @@ diabetes %>%
   ggplot(aes(x=chol_category, y=diabetic_per, fill = chol_category))+
   geom_col(alpha=0.6, position="dodge")+
   theme_linedraw()+
-  labs(title="Cholesterol Ratio vs. Diabetic",
+  labs(title="Cholesterol Ratio vs. Diabetes",
        x="Cholestrol Level",
        y="Percent")+
   scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
