@@ -124,7 +124,7 @@ age_diabetes <- diabetes %>%
 age_diabetes
 ```
 
-## Glucose vs. Diabetes
+## Mean Glucose vs. Diabetes
 ```{r}
 age_diabetes %>%
   select(diabetes, glucose, age_category) %>% 
@@ -132,6 +132,20 @@ age_diabetes %>%
   summarize(mean_glucose=mean(glucose)) %>% 
   ggplot(aes(x=diabetes, y=mean_glucose, fill=age_category))+
   geom_col(alpha=0.6, position="dodge")+
+  theme_linedraw()+
+  labs(title="Glucose Level",
+       x="Diabetes",
+       y="Glucose Level")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+## Median Glucose vs. Diabetes
+```{r}
+age_diabetes %>%
+  select(diabetes, glucose, age_category) %>% 
+  group_by(diabetes, age_category) %>% 
+  ggplot(aes(x=diabetes, y=glucose, fill = diabetes))+
+  geom_boxplot(alpha=0.6)+
   theme_linedraw()+
   labs(title="Glucose Level",
        x="Diabetes",
@@ -162,19 +176,6 @@ diabetes %>%
   scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
   theme(plot.title = element_text(hjust = 0.5))
   
-```
-
-```{r}
-age_diabetes %>%
-  select(diabetes, glucose, age_category) %>% 
-  group_by(diabetes, age_category) %>% 
-  ggplot(aes(x=diabetes, y=glucose, fill = diabetes))+
-  geom_boxplot(alpha=0.6)+
-  theme_linedraw()+
-  labs(title="Glucose Level",
-       x="Diabetes",
-       y="Glucose Level")+
-  theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ## Cholesterol Ratio vs. Diabetes with Gender

@@ -276,7 +276,7 @@ age_diabetes
 ## #   ⁴​chol_hdl_ratio
 ```
 
-## Glucose vs. Diabetes
+## Mean Glucose vs. Diabetes
 
 ```r
 age_diabetes %>%
@@ -298,6 +298,23 @@ age_diabetes %>%
 ```
 
 ![](diabetes_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
+## Median Glucose vs. Diabetes
+
+```r
+age_diabetes %>%
+  select(diabetes, glucose, age_category) %>% 
+  group_by(diabetes, age_category) %>% 
+  ggplot(aes(x=diabetes, y=glucose, fill = diabetes))+
+  geom_boxplot(alpha=0.6)+
+  theme_linedraw()+
+  labs(title="Glucose Level",
+       x="Diabetes",
+       y="Glucose Level")+
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+![](diabetes_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ## Cholesterol vs. Diabetes
 
@@ -321,22 +338,6 @@ diabetes %>%
        x="Cholestrol Level",
        y="Percent")+
   scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-![](diabetes_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
-
-
-```r
-age_diabetes %>%
-  select(diabetes, glucose, age_category) %>% 
-  group_by(diabetes, age_category) %>% 
-  ggplot(aes(x=diabetes, y=glucose, fill = diabetes))+
-  geom_boxplot(alpha=0.6)+
-  theme_linedraw()+
-  labs(title="Glucose Level",
-       x="Diabetes",
-       y="Glucose Level")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
