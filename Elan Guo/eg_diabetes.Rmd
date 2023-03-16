@@ -1,0 +1,79 @@
+---
+title: "kl_diabetes"
+output: html_document
+date: "2023-02-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+---
+title: "Group Project Data"
+output: html_document
+date: "2023-02-21"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(RColorBrewer)
+library(paletteer)
+library(janitor)
+library(here)
+library(naniar)
+library(shiny)
+library(shinydashboard)
+```
+
+
+```{r}
+getwd()
+```
+```{r}
+diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
+diabetes <- read_csv("Group Project Data/diabetes.csv")
+heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv")
+```
+```{r}
+names(diabetes)
+```
+
+```{r}
+anyNA(diabetes)
+```
+```{r}
+naniar::miss_var_summary(diabetes)
+```
+```{r}
+diabetes
+```
+
+```{r}
+diabetes %>%
+  select(age) %>% 
+  arrange(age)
+```
+
+```{r}
+diabetes %>% 
+  mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
+  mutate(age_category=case_when(age<=19~"teenager",
+         age>=20 & age<40~"adult",
+         age>=40 & age<60~"mid aged",
+         age>=60 & age<80~"senior",
+         age>=80~"super senior")) %>%  
+  filter(age_category!="NA") %>% 
+  group_by(age_category) %>% 
+  summarise(diabetic=sum(diabetic))%>% 
+  ggplot(aes(x=reorder(age_category, diabetic), y=diabetic, fill=age_category))+
+  geom_col(alpha=0.5)+
+  labs(title="Diabetes Age Range",
+       x="Age Group",
+       y="Count")
+```
+
+
