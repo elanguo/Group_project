@@ -196,6 +196,34 @@ diabetes %>%
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
+  mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
+         chol_ratio>=3.5 & chol_ratio<5~"Borderline",
+         age>=5~"High"))  %>%  
+  filter(chol_category!="NA") %>% 
+  count(gender, chol_category) %>% 
+  pivot_wider(names_from = chol_category,
+              names_prefix = "chol_",
+              values_from = n) %>% 
+  mutate(chol_Borderline_per = chol_Borderline*100/(chol_Borderline+chol_High+chol_Optimal),
+         chol_High_per = chol_High*100/(chol_Borderline+chol_High+chol_Optimal),
+         chol_Optimal_per = chol_Optimal*100/(chol_Borderline+chol_High+chol_Optimal)) %>%
+  pivot_longer(-c(gender, chol_Borderline, chol_High, chol_Optimal),
+               names_to = "chol_per_cat",
+               values_to = "chol_per") %>% 
+  ggplot(aes(x=chol_per_cat, y=chol_per, fill = gender))+
+  geom_col(alpha=0.6, position="dodge")+
+  theme_linedraw()+
+  labs(title="Cholesterol Ratio",
+       x="Cholestrol Level",
+       y="Percent")+
+  scale_x_discrete(limits=c("chol_Optimal_per", "chol_Borderline_per", "chol_High_per"))+
+  theme(plot.title = element_text(hjust = 0.5))
+  
+```
+
+```{r}
+diabetes %>% 
+  mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   count(diabetic, gender) %>%
   pivot_wider(names_from = diabetic,
               names_prefix = "diabetic_",
