@@ -13,6 +13,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Load library
 ```{r}
 library(tidyverse)
 library(RColorBrewer)
@@ -24,29 +25,33 @@ library(shiny)
 library(shinydashboard)
 ```
 
-
+# Get working directory
 ```{r}
 getwd()
 ```
-
+## Import and clean dataset
 ```{r}
-diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
 diabetes <- read_csv("Group Project Data/diabetes.csv")
-heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv")
 ```
 
+Originally taken from Kaggle,
+This dataset is originally from the National Institute of Diabetes and Digestive and Kidney Diseases 
+
+## Take a looks at columns names to make sure they are all tidy
 ```{r}
 names(diabetes)
 ```
 
+## Find NAs
 ```{r}
 anyNA(diabetes)
 ```
-
+## Check if any value is missing
 ```{r}
 naniar::miss_var_summary(diabetes)
 ```
 
+## Replace "," with "." for later calculation
 ```{r}
 diabetes <- diabetes %>% 
   mutate_if(is.character, ~str_replace(., ",", ".")) %>%
@@ -54,6 +59,7 @@ diabetes <- diabetes %>%
 diabetes
 ```
 
+## Age vs. Diabetes
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -78,6 +84,8 @@ diabetes %>%
   scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+## Age vs. Diabetes including Gender
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -102,6 +110,8 @@ diabetes %>%
   scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+## Set new dataframe
 ```{r}
 age_diabetes <- diabetes %>%
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -114,6 +124,7 @@ age_diabetes <- diabetes %>%
 age_diabetes
 ```
 
+## Glucose vs. Diabetes
 ```{r}
 age_diabetes %>%
   select(diabetes, glucose, age_category) %>% 
@@ -128,6 +139,7 @@ age_diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
+## Cholesterol vs. Diabetes
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -152,6 +164,7 @@ diabetes %>%
   
 ```
 
+## Cholesterol Ratio vs. Diabetes with Gender
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -176,6 +189,7 @@ diabetes %>%
   
 ```
 
+## Cholesterol Ratio vs. Gender
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -202,10 +216,8 @@ diabetes %>%
   scale_x_discrete(limits=c("Optimal", "Borderline", "High"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-```{r}
 
-```
-
+## Gender vs. Diabetes
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 

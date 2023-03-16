@@ -1,7 +1,7 @@
 ---
 title: "diabetes"
 author: "Kellie Liu"
-date: "2023-03-15"
+date: "2023-03-16"
 output:
   html_document:
     theme: spacelab
@@ -11,6 +11,7 @@ output:
 
 
 
+# Load library
 
 ```r
 library(tidyverse)
@@ -65,7 +66,7 @@ library(shinydashboard)
 ##     box
 ```
 
-
+# Get working directory
 
 ```r
 getwd()
@@ -74,22 +75,7 @@ getwd()
 ```
 ## [1] "C:/Users/USER/OneDrive/桌面/Group_project/Kellie Liu"
 ```
-
-
-```r
-diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
-```
-
-```
-## Rows: 952 Columns: 18
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: ","
-## chr (14): Age, Gender, Family_Diabetes, highBP, PhysicallyActive, Smoking, A...
-## dbl  (4): BMI, Sleep, SoundSleep, Pregancies
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
+## Import and clean dataset
 
 ```r
 diabetes <- read_csv("Group Project Data/diabetes.csv")
@@ -107,20 +93,10 @@ diabetes <- read_csv("Group Project Data/diabetes.csv")
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 ```
 
-```r
-heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv")
-```
+Originally taken from Kaggle,
+This dataset is originally from the National Institute of Diabetes and Digestive and Kidney Diseases 
 
-```
-## Rows: 299 Columns: 13
-## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: ","
-## dbl (13): age, anaemia, creatinine_phosphokinase, diabetes, ejection_fractio...
-## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-```
-
+## Take a looks at columns names to make sure they are all tidy
 
 ```r
 names(diabetes)
@@ -133,6 +109,7 @@ names(diabetes)
 ## [13] "waist"           "hip"             "waist_hip_ratio" "diabetes"
 ```
 
+## Find NAs
 
 ```r
 anyNA(diabetes)
@@ -141,7 +118,7 @@ anyNA(diabetes)
 ```
 ## [1] FALSE
 ```
-
+## Check if any value is missing
 
 ```r
 naniar::miss_var_summary(diabetes)
@@ -169,6 +146,7 @@ naniar::miss_var_summary(diabetes)
 ## 16 diabetes             0        0
 ```
 
+## Replace "," with "." for later calculation
 
 ```r
 diabetes <- diabetes %>% 
@@ -197,6 +175,7 @@ diabetes
 ## #   ¹​patient_number, ²​cholesterol, ³​hdl_chol, ⁴​chol_hdl_ratio
 ```
 
+## Age vs. Diabetes
 
 ```r
 diabetes %>% 
@@ -229,6 +208,8 @@ diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
+## Age vs. Diabetes including Gender
+
 ```r
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -259,6 +240,8 @@ diabetes %>%
 ```
 
 ![](diabetes_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+## Set new dataframe
 
 ```r
 age_diabetes <- diabetes %>%
@@ -293,6 +276,7 @@ age_diabetes
 ## #   ⁴​chol_hdl_ratio
 ```
 
+## Glucose vs. Diabetes
 
 ```r
 age_diabetes %>%
@@ -315,6 +299,7 @@ age_diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
+## Cholesterol vs. Diabetes
 
 ```r
 diabetes %>% 
@@ -341,6 +326,7 @@ diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
+## Cholesterol Ratio vs. Diabetes with Gender
 
 ```r
 diabetes %>% 
@@ -367,6 +353,7 @@ diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
 
+## Cholesterol Ratio vs. Gender
 
 ```r
 diabetes %>% 
@@ -397,7 +384,7 @@ diabetes %>%
 
 ![](diabetes_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
-
+## Gender vs. Diabetes
 
 ```r
 diabetes %>% 
@@ -416,5 +403,5 @@ diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![](diabetes_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
+![](diabetes_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
