@@ -276,7 +276,7 @@ summary(map_data_focused_2008$values)
 ```
 
 ```{r}
-plot_usmap(data = map_data_focused_2004)+
+plot_usmap(data = map_data_focused_2008)+
   scale_fill_gradient2(low = "deepskyblue3", mid = "white", high = "red", name = "Diabetes Percentage", midpoint = 8)
 ```
 
