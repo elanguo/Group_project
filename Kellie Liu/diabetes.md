@@ -321,7 +321,7 @@ diabetes %>%
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
          chol_ratio>=3.5 & chol_ratio<5~"Borderline High",
-         age>=5~"High"))  %>%  
+         chol_ratio>=5~"High"))  %>%  
   filter(chol_category!="NA") %>%  
   filter(diabetic != "NA") %>% 
   count(diabetic, chol_category) %>% 
@@ -347,7 +347,7 @@ diabetes %>%
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
          chol_ratio>=3.5 & chol_ratio<5~"Borderline High",
-         age>=5~"High"))  %>%  
+         chol_ratio>=5~"High"))  %>%  
   filter(chol_category!="NA") %>%  
   filter(diabetic != "NA") %>% 
   count(diabetic, chol_category, gender) %>% 
@@ -373,7 +373,7 @@ diabetes %>%
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
          chol_ratio>=3.5 & chol_ratio<5~"Borderline",
-         age>=5~"High"))  %>%  
+         chol_ratio>=5~"High"))  %>%  
   filter(chol_category!="NA") %>% 
   count(gender, chol_category) %>% 
   pivot_wider(names_from = chol_category,
@@ -410,14 +410,11 @@ diabetes %>%
   ggplot(aes(x=gender, y=diabetic_per, fill = gender))+
   geom_col(alpha=0.6, position="dodge")+
   theme_linedraw()+
-  labs(title="Genders vs. Diabetes",
+  labs(title="Gender vs. Diabetes",
        x="Gender",
        y="Percent")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ![](diabetes_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
-
-
-
 
