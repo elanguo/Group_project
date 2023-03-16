@@ -1,10 +1,12 @@
 ---
-title: "kl_diabetes"
+title: "diabetes"
 author: "Kellie Liu"
-output: 
+date: "`r Sys.Date()`"
+output:
   html_document:
-  keep_md: yes
-date: "2023-02-21"
+    theme: spacelab
+    toc: no
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -26,11 +28,13 @@ library(shinydashboard)
 ```{r}
 getwd()
 ```
+
 ```{r}
 diabetes_2019 <- read_csv("Group Project Data/diabetes_dataset__2019.csv") %>% clean_names()
 diabetes <- read_csv("Group Project Data/diabetes.csv")
 heart_failture <- read_csv("Group Project Data/heart_failure_clinical_records_dataset.csv")
 ```
+
 ```{r}
 names(diabetes)
 ```
@@ -38,11 +42,9 @@ names(diabetes)
 ```{r}
 anyNA(diabetes)
 ```
+
 ```{r}
 naniar::miss_var_summary(diabetes)
-```
-```{r}
-diabetes
 ```
 
 ```{r}
@@ -50,13 +52,6 @@ diabetes <- diabetes %>%
   mutate_if(is.character, ~str_replace(., ",", ".")) %>%
   mutate(chol_ratio = as.numeric(cholesterol/hdl_chol))
 diabetes
-```
-
-
-```{r}
-diabetes %>%
-  select(age) %>% 
-  arrange(age)
 ```
 
 ```{r}
@@ -76,40 +71,37 @@ diabetes %>%
   mutate(diabetic_per = diabetic_1*100/(diabetic_1+diabetic_0)) %>% 
   ggplot(aes(x=age_category, y=diabetic_per, fill=age_category))+
   geom_col(alpha=0.6, position="dodge")+
+  theme_linedraw()+
   labs(title="Diabetes Age Range",
        x="Age Group",
        y="Percent")+
   scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-
 ```{r}
-plot_data <- diabetes %>% 
+diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
   mutate(age_category=case_when(age<=19~"teenager",
          age>=20 & age<40~"adult",
          age>=40 & age<60~"mid aged",
          age>=60 & age<80~"senior",
          age>=80~"super senior")) %>%  
-  filter(age_category!="NA") %>% 
-  group_by(age_category, gender) %>% 
-  summarise(diabetic=sum(diabetic))
-plot_data
-```
-```{r}
-plot_data%>% 
-  ggplot(aes(x=age_category, y=diabetic, fill=gender))+
+  filter(age_category!="NA") %>%  
+  filter(diabetic != "NA") %>% 
+  count(diabetic, age_category, gender) %>% 
+  pivot_wider(names_from = diabetic,
+              names_prefix = "diabetic_",
+              values_from = n) %>% 
+  mutate(diabetic_per = diabetic_1*100/(diabetic_1+diabetic_0)) %>% 
+  ggplot(aes(x=age_category, y=diabetic_per, fill=gender))+
   geom_col(alpha=0.6, position="dodge")+
-  labs(title="Diabetes Age Range",
+  theme_linedraw()+
+  labs(title="Diabetes Age Range vs. Gender",
        x="Age Group",
-       y="Count")+
+       y="Percent")+
   scale_x_discrete(limits=c("teenager", "adult", "mid aged", "senior", "super senior"))+
   theme(plot.title = element_text(hjust = 0.5))
 ```
-```{r}
-diabetes
-```
-
 ```{r}
 age_diabetes <- diabetes %>%
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -129,42 +121,13 @@ age_diabetes %>%
   summarize(mean_glucose=mean(glucose)) %>% 
   ggplot(aes(x=diabetes, y=mean_glucose, fill=age_category))+
   geom_col(alpha=0.6, position="dodge")+
+  theme_linedraw()+
   labs(title="Glucose Level",
        x="Diabetes",
        y="Glucose Level")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
 
-```{r}
-diabetes %>% 
-  mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
-  mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
-         chol_ratio>=3.5 & chol_ratio<5~"Borderline High",
-         age>=5~"High")) %>%
-  select(chol_category, diabetic) %>% 
-  group_by(chol_category) %>% 
-  summarize(diabetic_status = sum(diabetic)) %>% 
-  ggplot(aes(x=chol_category, y=diabetic_status, fill = chol_category))+
-  geom_col(alpha=0.6, position="dodge")+
-  theme_linedraw()+
-  geom_text(aes(label=diabetic_status, vjust = -0.5), color = "deepskyblue4")+
-  labs(title="Cholesterol Ratio",
-       x="Cholestrol Level",
-       y="Diabetic")+
-  scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
-  theme(plot.title = element_text(hjust = 0.5))
-```
-
-```{r}
-diabetes %>% 
-  filter(diabetes != "NA") %>% 
-  ggplot(aes(x=diabetes, y=chol_ratio, fill=gender))+
-  geom_boxplot(alpha=0.6)+
-  theme_linedraw()+
-  labs(x="Diabetes",
-       y="Cholesterol Ratio",
-       title = "Cholesterol Level vs. Diabetes")
-```
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -188,6 +151,31 @@ diabetes %>%
   theme(plot.title = element_text(hjust = 0.5))
   
 ```
+
+```{r}
+diabetes %>% 
+  mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
+  mutate(chol_category=case_when(chol_ratio<=3.5~"Optimal",
+         chol_ratio>=3.5 & chol_ratio<5~"Borderline High",
+         age>=5~"High"))  %>%  
+  filter(chol_category!="NA") %>%  
+  filter(diabetic != "NA") %>% 
+  count(diabetic, chol_category, gender) %>% 
+  pivot_wider(names_from = diabetic,
+              names_prefix = "diabetic_",
+              values_from = n) %>% 
+  mutate(diabetic_per = diabetic_1*100/(diabetic_1+diabetic_0)) %>%
+  ggplot(aes(x=chol_category, y=diabetic_per, fill = gender))+
+  geom_col(alpha=0.6, position="dodge")+
+  theme_linedraw()+
+  labs(title="Diabetic Cholesterol Ratio vs. Gender",
+       x="Cholestrol Level",
+       y="Percent")+
+  scale_x_discrete(limits=c("Optimal", "Borderline High", "High"))+
+  theme(plot.title = element_text(hjust = 0.5))
+  
+```
+
 ```{r}
 diabetes %>% 
   mutate(diabetic=ifelse(diabetes == "Diabetes", 1, 0)) %>% 
@@ -208,12 +196,14 @@ diabetes %>%
   ggplot(aes(x=chol_per_cat, y=chol_per, fill = gender))+
   geom_col(alpha=0.6, position="dodge")+
   theme_linedraw()+
-  labs(title="Cholesterol Ratio",
+  labs(title="Cholesterol Ratio vs. Gender",
        x="Cholestrol Level",
        y="Percent")+
   scale_x_discrete(limits=c("Optimal", "Borderline", "High"))+
   theme(plot.title = element_text(hjust = 0.5))
-  
+```
+```{r}
+
 ```
 
 ```{r}
@@ -227,9 +217,12 @@ diabetes %>%
   ggplot(aes(x=gender, y=diabetic_per, fill = gender))+
   geom_col(alpha=0.6, position="dodge")+
   theme_linedraw()+
-  labs(title="Genders vs. Diabetic",
+  labs(title="Genders vs. Diabetes",
        x="Gender",
        y="Percent")+
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+
+
 
